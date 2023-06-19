@@ -1,6 +1,9 @@
-#include "linux/types.h"
+#ifndef _PORT_H_
+# define _PORT_H_
 
-void outb (uint16_t port, uint8_t val)
+# include "../linux/types.h"
+
+static inline void outb (uint16_t port, uint8_t val)
 {
     asm volatile ("outb %0, %1"
 					:
@@ -8,7 +11,7 @@ void outb (uint16_t port, uint8_t val)
 					: "memory");
 }
 
-uint8_t inb (uint16_t port)
+static inline uint8_t inb (uint16_t port)
 {
     uint8_t val;
 
@@ -18,3 +21,5 @@ uint8_t inb (uint16_t port)
                    : "memory");
     return val;
 }
+
+#endif

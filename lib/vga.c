@@ -1,5 +1,5 @@
 #include "vga.h"
-#include "port.h"
+#include "asm-i386/port.h"
 
 struct vga sys_vga;
 

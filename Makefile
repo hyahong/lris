@@ -6,12 +6,11 @@ LD			= ld
 
 RM			= rm -rf
 
-ARCH		= arch/i386/boot/boot.asm arch/i386/port.c
+ARCH		= arch/i386/boot/boot.asm
 INIT		= init/main.c
-VGA			= lib/vga.c
-LIB			= lib/string.c
+LIB			= lib/vga.c lib/string.c
 
-SRCS		= $(ARCH) $(INIT) $(VGA) $(LIB)
+SRCS		= $(ARCH) $(INIT) $(LIB)
 INCS		= include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))
