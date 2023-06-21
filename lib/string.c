@@ -1,6 +1,6 @@
 #include "linux/string.h"
 
-unsigned int strlen (char *str)
+unsigned int strlen (const char *str)
 {
 	unsigned int length;
 

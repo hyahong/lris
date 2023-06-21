@@ -18,12 +18,46 @@ void vga_init (void)
 	sys_vga.color.fore = VGA_COLOR_WHITE;
 }
 
-void vga_draw (char character, uint8_t forward)
+void _vga_draw (char character)
 {
 	int index;
 
 	index = sys_vga.cursor.x + sys_vga.cursor.y * VGA_WIDTH;
-	sys_vga.buffer[index] = (*((uint8_t *) &sys_vga.color) << 8) | character;
+	sys_vga.buffer[index] = (*((uint8_t *) &sys_vga.color) << 8) | character;	
+}
+
+void _vga_draw_escape (char escape)
+{
+	switch (escape)
+	{
+		/* line feed */
+		case 0xA:
+			vga_lf ();
+			break;
+		
+		default:
+			break;
+	}
+}
+
+void vga_draw (char character, uint8_t forward)
+{
+	char escape[5] = {
+		0x8, 0x9, 0xA, 0xB
+	};
+	int i;
+	
+	for (i = 0; i < 4; i++)
+	{
+		if (escape[i] == character)
+		{
+			_vga_draw_escape (character);
+			return ;
+		}
+	}
+	_vga_draw (character);
+
+end:
 	if (forward)
 	{
 		sys_vga.cursor.x++;

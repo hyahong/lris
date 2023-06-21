@@ -20,7 +20,7 @@ void kernel_init (void)
 	vga_lf ();
 	vga_set_cursor ();
 
-	printk ("test", 42, 41);
+	printk ("this is test message.\nthis is newline test\ndo you know the meaning behind the number '%d'?\na", 42, 41);
 
 	while (1)
 	{
