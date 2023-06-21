@@ -1,6 +1,9 @@
 #include "vga.h"
 #include "linux/string.h"
 
+#include "asm-i386/port.h"
+#include "linux/printk.h"
+
 void kernel_init (void)
 {
 	vga_init ();
@@ -14,4 +17,16 @@ void kernel_init (void)
 	}
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 	vga_draw ('.', 1);
+	vga_lf ();
+	vga_set_cursor ();
+
+	printk ("test", 42, 41);
+
+	while (1)
+	{
+		if (!(inb (0x64) & 1))
+			continue;
+
+		vga_draw ('.', 1);
+	}
 }

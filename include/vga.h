@@ -42,5 +42,9 @@ enum vga_color {
 
 void vga_init (void);
 void vga_draw (char character, uint8_t forward);
+void vga_set_color (uint8_t back, uint8_t fore);
+void vga_set_position (uint8_t x, uint8_t y);
+void vga_set_cursor (void);
+void vga_lf (void);
 
 #endif

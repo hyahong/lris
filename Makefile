@@ -8,9 +8,10 @@ RM			= rm -rf
 
 ARCH		= arch/i386/boot/boot.asm
 INIT		= init/main.c
+KERNEL		= kernel/printk/printk.c
 LIB			= lib/vga.c lib/string.c
 
-SRCS		= $(ARCH) $(INIT) $(LIB)
+SRCS		= $(ARCH) $(INIT) $(KERNEL) $(LIB)
 INCS		= include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))

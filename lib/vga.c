@@ -18,18 +18,6 @@ void vga_init (void)
 	sys_vga.color.fore = VGA_COLOR_WHITE;
 }
 
-void vga_set_color (uint8_t back, uint8_t fore)
-{
-	sys_vga.color.back = back;
-	sys_vga.color.fore = fore;
-}
-
-void vga_set_cursor (uint8_t x, uint8_t y)
-{
-	sys_vga.cursor.x = x;
-	sys_vga.cursor.y = y;
-}
-
 void vga_draw (char character, uint8_t forward)
 {
 	int index;
@@ -45,11 +33,40 @@ void vga_draw (char character, uint8_t forward)
 			sys_vga.cursor.y++;
 		}
 	}
-	++index;
-	/* cursor position */
+}
+
+void vga_set_color (uint8_t back, uint8_t fore)
+{
+	sys_vga.color.back = back;
+	sys_vga.color.fore = fore;
+}
+
+void vga_set_position (uint8_t x, uint8_t y)
+{
+	sys_vga.cursor.x = x;
+	sys_vga.cursor.y = y;
+}
+
+void _vga_set_cursor (uint8_t x, uint8_t y)
+{
+	int index;
+
+	index = x + y * VGA_WIDTH;
+
 	outb (0x3D4, 0x0E);
 	outb (0x3D5, (uint8_t) ((index >> 8) & 0xFF));
 	outb (0x3D4, 0x0F);
 	outb (0x3D5, (uint8_t) (index & 0xFF));
+}
+
+void vga_set_cursor (void)
+{
+	_vga_set_cursor (sys_vga.cursor.x, sys_vga.cursor.y);
+}
+
+void vga_lf (void)
+{
+	sys_vga.cursor.x = 0;
+	sys_vga.cursor.y++;
 }
 
