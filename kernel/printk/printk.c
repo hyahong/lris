@@ -3,14 +3,14 @@
 #include "linux/string.h"
 #include "linux/printk.h"
 
-void printk_info_init (struct printk_info *info, const char *format)
+static void printk_info_init (struct printk_info *info, const char *format)
 {
 	info->format = format;
 	info->size = PRINTK_BUFFER_SIZE;
 	info->offset = 0;
 }
 
-void printk_buffer_write (struct printk_info *info, char *str, int length)
+static void printk_buffer_write (struct printk_info *info, char *str, int length)
 {
 	int i;
 
@@ -23,12 +23,12 @@ void printk_buffer_write (struct printk_info *info, char *str, int length)
 	info->offset += length;
 }
 
-void printk_parse_flags (struct printk_info *info)
+static void printk_parse_flags (struct printk_info *info)
 {
 	++info->format;
 }
 
-void printk_argument_d (struct printk_info *info, int arg)
+static void printk_argument_d (struct printk_info *info, int arg)
 {
 	char buffer[16];
 	int length;
@@ -45,7 +45,7 @@ void printk_argument_d (struct printk_info *info, int arg)
 		printk_buffer_write (info, &buffer[length - i - 1], 1);
 }
 
-void printk_write_argument (struct printk_info *info, va_list args)
+static void printk_write_argument (struct printk_info *info, va_list args)
 {
 	switch (*info->format)
 	{

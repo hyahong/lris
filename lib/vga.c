@@ -18,7 +18,7 @@ void vga_init (void)
 	sys_vga.color.fore = VGA_COLOR_WHITE;
 }
 
-void _vga_draw (char character)
+static void _vga_draw (char character)
 {
 	int index;
 
@@ -26,7 +26,7 @@ void _vga_draw (char character)
 	sys_vga.buffer[index] = (*((uint8_t *) &sys_vga.color) << 8) | character;	
 }
 
-void _vga_draw_escape (char escape)
+static void _vga_draw_escape (char escape)
 {
 	switch (escape)
 	{
@@ -81,7 +81,7 @@ void vga_set_position (uint8_t x, uint8_t y)
 	sys_vga.cursor.y = y;
 }
 
-void _vga_set_cursor (uint8_t x, uint8_t y)
+static void _vga_set_cursor (uint8_t x, uint8_t y)
 {
 	int index;
 
