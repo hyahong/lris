@@ -7,11 +7,12 @@ LD			= ld
 RM			= rm -rf
 
 ARCH		= arch/i386/boot/boot.asm
+DRIVERS		= drivers/tty/keyboard.c drivers/tty/wrapper.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c
 LIB			= lib/vga.c lib/string.c
 
-SRCS		= $(ARCH) $(INIT) $(KERNEL) $(LIB)
+SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB)
 INCS		= include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))

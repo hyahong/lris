@@ -28,18 +28,32 @@ static void printk_parse_flags (struct printk_info *info)
 	++info->format;
 }
 
+static void printk_argument_c (struct printk_info *info, char arg)
+{
+	printk_buffer_write (info, &arg, 1);
+}
+
 static void printk_argument_d (struct printk_info *info, int arg)
 {
+	uint8_t minus;
 	char buffer[16];
 	int length;
 	int i;
 	
+	minus = 0;
+	if (arg < 0)
+	{
+		minus = 1;
+		arg *= -1;
+	}
 	length = 0;
 	do
 	{
 		buffer[length++] = '0' + arg % 10;
 	}
 	while (arg /= 10);
+	if (minus)
+		buffer[length++] = '-';
 
 	for (i = 0; i < length; i++)
 		printk_buffer_write (info, &buffer[length - i - 1], 1);
@@ -49,6 +63,10 @@ static void printk_write_argument (struct printk_info *info, va_list args)
 {
 	switch (*info->format)
 	{
+		case 'c':
+			printk_argument_c (info, va_arg (args, char));
+			break;
+
 		case 'd':
 			printk_argument_d (info, va_arg (args, int));
 			break;

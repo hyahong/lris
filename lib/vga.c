@@ -57,15 +57,11 @@ void vga_draw (char character, uint8_t forward)
 	}
 	_vga_draw (character);
 
-end:
 	if (forward)
 	{
 		sys_vga.cursor.x++;
 		if (sys_vga.cursor.x == VGA_WIDTH)
-		{
-			sys_vga.cursor.x = 0;
-			sys_vga.cursor.y++;
-		}
+			vga_lf ();
 	}
 }
 
@@ -102,5 +98,30 @@ void vga_lf (void)
 {
 	sys_vga.cursor.x = 0;
 	sys_vga.cursor.y++;
+	
+	if (sys_vga.cursor.y == VGA_HEIGHT)
+		vga_scroll ();
 }
 
+void vga_scroll (void)
+{
+	int i;
+
+	for (i = 0; i < VGA_WIDTH * (VGA_HEIGHT - 1); i++)
+		sys_vga.buffer[i] = sys_vga.buffer[i + VGA_WIDTH];
+	for (i = 0; i < VGA_WIDTH; i++)
+		sys_vga.buffer[i + VGA_WIDTH * (VGA_HEIGHT - 1)] = VGA_NULL;
+	--sys_vga.cursor.y;
+	vga_set_cursor ();
+}
+
+void vga_clear (void)
+{
+	int i;
+
+	for (i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++)
+		sys_vga.buffer[i] = VGA_NULL;
+	sys_vga.cursor.x = 0;
+	sys_vga.cursor.y = 0;
+	vga_set_cursor ();
+}

@@ -1,10 +1,12 @@
 #ifndef _VGA_H_
 # define _VGA_H_
 
+# include "linux/types.h"
+
 # define VGA_WIDTH 80
 # define VGA_HEIGHT 25
 
-# include "linux/types.h"
+# define VGA_NULL 1824
 
 struct vga
 {
@@ -46,5 +48,7 @@ void vga_set_color (uint8_t back, uint8_t fore);
 void vga_set_position (uint8_t x, uint8_t y);
 void vga_set_cursor (void);
 void vga_lf (void);
+void vga_scroll (void);
+void vga_clear (void);
 
 #endif

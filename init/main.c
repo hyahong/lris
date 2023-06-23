@@ -1,14 +1,16 @@
 #include "vga.h"
-#include "linux/string.h"
-
 #include "asm-i386/port.h"
+#include "linux/string.h"
+#include "linux/keyboard.h"
 #include "linux/printk.h"
 
 void kernel_init (void)
 {
 	vga_init ();
+	keyboard_init ();
 
-	char *test = "test message thank you and this is test kernel to study referenced by KFS-1 now we can boot this kernel with qemu emulator";
+	char *test = "test message thank you and this is test kernel to study referenced \
+				  by KFS-1 now we can boot this kernel with qemu emulator";
 
 	for (int i = 0; i < strlen (test); i++)
 	{
@@ -23,9 +25,11 @@ void kernel_init (void)
 
 	while (1)
 	{
+		int d;
+
 		if (!(inb (0x64) & 1))
 			continue;
 
-		printk ("keyboard input: %d\n", inb (0x60));
+		keyboard_handler ();
 	}
 }
