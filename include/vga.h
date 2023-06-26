@@ -8,6 +8,8 @@
 
 # define VGA_NULL 1824
 
+# define VGA_BASE_ADDRESS 0xB8000
+
 struct vga
 {
 	uint16_t *buffer;

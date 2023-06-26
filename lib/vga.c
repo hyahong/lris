@@ -1,6 +1,6 @@
 #include "vga.h"
 #ifdef i386
-# include "asm-i386/port.h"
+# include "port.h"
 #else
 # error "this build target is not supported."
 #endif
@@ -10,7 +10,7 @@ struct vga sys_vga;
 void vga_init (void)
 {
 	/* VGA Video RAM address B800:0000 */
-	sys_vga.buffer = (uint16_t *) 0xB8000;
+	sys_vga.buffer = (uint16_t *) VGA_BASE_ADDRESS;
 	sys_vga.cursor.x = 0;
 	sys_vga.cursor.y = 0;
 	/* default color: block background and white foreground */
@@ -26,6 +26,9 @@ static void _vga_draw (char character)
 	sys_vga.buffer[index] = (*((uint8_t *) &sys_vga.color) << 8) | character;	
 }
 
+/*
+ * escape sequence
+ */
 static void _vga_draw_escape (char escape)
 {
 	switch (escape)

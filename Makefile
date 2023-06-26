@@ -6,14 +6,14 @@ LD			= ld
 
 RM			= rm -rf
 
-ARCH		= arch/i386/boot/boot.asm
+ARCH		= arch/i386/boot/boot.asm arch/i386/segment.c
 DRIVERS		= drivers/tty/keyboard.c drivers/tty/wrapper.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c
 LIB			= lib/vga.c lib/string.c
 
 SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB)
-INCS		= include
+INCS		= -Iinclude -Iarch/i386/include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))
 OBJS		:= $(filter %.o,$(OBJS))
@@ -30,7 +30,7 @@ all: $(OBJS) $(BIN) pack run
 	@echo "ASM\t" $@
 
 %.o: %.c
-	@$(CC) $(CFLAGS) -I$(INCS) -c $< -o $@
+	@$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 	@echo "CC\t" $@
 
 $(BIN):

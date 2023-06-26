@@ -59,16 +59,40 @@ static void printk_argument_d (struct printk_info *info, int arg)
 		printk_buffer_write (info, &buffer[length - i - 1], 1);
 }
 
-static void printk_write_argument (struct printk_info *info, va_list args)
+static void printk_argument_x (struct printk_info *info, unsigned int arg, uint8_t upper)
+{
+	char buffer[16];
+	int length;
+	int i;
+	
+	length = 0;
+	do
+	{
+		buffer[length++] = (upper ? "0123456789ABCDEF" : "0123456789abcdef")[arg % 16];
+	}
+	while (arg /= 16);
+	buffer[length++] = 'x';
+	buffer[length++] = '0';
+
+	for (i = 0; i < length; i++)
+		printk_buffer_write (info, &buffer[length - i - 1], 1);
+}
+
+static void printk_write_argument (struct printk_info *info, va_list *args)
 {
 	switch (*info->format)
 	{
+		case 'x':
+		case 'X':
+			printk_argument_x (info, va_arg (*args, unsigned int), *info->format == 'X');
+			break;
+
 		case 'c':
-			printk_argument_c (info, va_arg (args, char));
+			printk_argument_c (info, va_arg (*args, char));
 			break;
 
 		case 'd':
-			printk_argument_d (info, va_arg (args, int));
+			printk_argument_d (info, va_arg (*args, int));
 			break;
 
 		default:
@@ -91,7 +115,7 @@ int printk (const char *format, ...)
 		if (*info.format == '%')
 		{
 			printk_parse_flags (&info);
-			printk_write_argument (&info, args);
+			printk_write_argument (&info, &args);
 		}
 		else
 		{

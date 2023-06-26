@@ -1,4 +1,8 @@
-#include "asm-i386/port.h"
+#ifdef i386
+# include "port.h"
+#else
+# error "this build target is not supported."
+#endif
 #include "linux/keyboard.h"
 #include "linux/wrapper.h"
 
@@ -44,6 +48,9 @@ void keyboard_handler (void)
 
 	code = inb (IO_DATA_PORT);
 	
+	/*
+	 * keyboard event hook
+	 */
 	if (code < KEY_RELEASE_OFFSET)
 		keyboard_press (code);
 	else
