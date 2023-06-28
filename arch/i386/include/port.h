@@ -1,7 +1,7 @@
 #ifndef _PORT_H_
 # define _PORT_H_
 
-# include "linux/types.h"
+# include "lris/types.h"
 
 # define IO_DATA_PORT 0x60
 # define IO_STATUS_REGISTER 0x64

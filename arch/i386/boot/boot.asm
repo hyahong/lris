@@ -23,9 +23,10 @@ extern kernel_init
 
 start:
 	mov esp, stack_top
-	
+
 	cli		; clear an interrupt flag
 
 	call kernel_init
 
 	hlt		; stop
+

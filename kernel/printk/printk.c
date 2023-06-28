@@ -1,13 +1,21 @@
 #include "vga.h"
-#include "linux/stdarg.h"
-#include "linux/string.h"
-#include "linux/printk.h"
+#include "lris/stdarg.h"
+#include "lris/string.h"
+#include "lris/printk.h"
 
 static void printk_info_init (struct printk_info *info, const char *format)
 {
+	int i;
+
 	info->format = format;
+	for (i = 0; i < PRINTK_BUFFER_SIZE + 1; i++)
+		info->buffer[i] = 0;
 	info->size = PRINTK_BUFFER_SIZE;
 	info->offset = 0;
+	/* flag */
+	info->flags = 0;
+	info->flag.fill = ' ';
+	info->flag.width = 0;
 }
 
 static void printk_buffer_write (struct printk_info *info, char *str, int length)
@@ -25,12 +33,75 @@ static void printk_buffer_write (struct printk_info *info, char *str, int length
 
 static void printk_parse_flags (struct printk_info *info)
 {
-	++info->format;
+	int i;
+
+	i = 0;
+	info->format++;
+	/* set fill from ' ' to '0' */
+	if (info->format[0] == '0')
+	{
+		info->flag.fill = '0';
+		info->format++;
+	}
+	/* width flag */
+	while ((int) strchr ("xXcsd", info->format[i]) < 0)
+		++i;
+	if (i != 1)
+	{
+		info->flags |= PRINTK_FLAG_WIDTH;
+		info->flag.width = atoi (info->format);
+	}
+	info->format += i;
+}
+
+static void printk_argument_x (struct printk_info *info, unsigned int arg, uint8_t upper)
+{
+	char buffer[32];
+	int length;
+	int i;
+	
+	length = 0;
+	do
+	{
+		buffer[length++] = (upper ? "0123456789ABCDEF" : "0123456789abcdef")[arg % 16];
+	}
+	while (arg /= 16);
+	/* fill with character by width */
+	if (info->flags & PRINTK_FLAG_WIDTH)
+	{
+		if (info->flag.fill == ' ')
+		{
+			buffer[length++] = 'x';
+			buffer[length++] = '0';
+			while (length + 2 < info->flag.width)
+				buffer[length++] = ' ';
+		}
+		else if (info->flag.fill == '0')
+		{
+			while (length + 2 < info->flag.width)
+				buffer[length++] = '0';
+			buffer[length++] = 'x';
+			buffer[length++] = '0';
+		}
+	}
+	else
+	{
+		buffer[length++] = 'x';
+		buffer[length++] = '0';
+	}
+	/* reverse */
+	for (i = 0; i < length; i++)
+		printk_buffer_write (info, &buffer[length - i - 1], 1);
 }
 
 static void printk_argument_c (struct printk_info *info, char arg)
 {
 	printk_buffer_write (info, &arg, 1);
+}
+
+static void printk_argument_s (struct printk_info *info, char *arg)
+{
+	printk_buffer_write (info, arg, strlen (arg));
 }
 
 static void printk_argument_d (struct printk_info *info, int arg)
@@ -59,25 +130,6 @@ static void printk_argument_d (struct printk_info *info, int arg)
 		printk_buffer_write (info, &buffer[length - i - 1], 1);
 }
 
-static void printk_argument_x (struct printk_info *info, unsigned int arg, uint8_t upper)
-{
-	char buffer[16];
-	int length;
-	int i;
-	
-	length = 0;
-	do
-	{
-		buffer[length++] = (upper ? "0123456789ABCDEF" : "0123456789abcdef")[arg % 16];
-	}
-	while (arg /= 16);
-	buffer[length++] = 'x';
-	buffer[length++] = '0';
-
-	for (i = 0; i < length; i++)
-		printk_buffer_write (info, &buffer[length - i - 1], 1);
-}
-
 static void printk_write_argument (struct printk_info *info, va_list *args)
 {
 	switch (*info->format)
@@ -89,6 +141,10 @@ static void printk_write_argument (struct printk_info *info, va_list *args)
 
 		case 'c':
 			printk_argument_c (info, va_arg (*args, char));
+			break;
+
+		case 's':
+			printk_argument_s (info, va_arg (*args, char *));
 			break;
 
 		case 'd':

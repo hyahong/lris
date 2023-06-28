@@ -3,8 +3,8 @@
 #else
 # error "this build target is not supported."
 #endif
-#include "linux/keyboard.h"
-#include "linux/wrapper.h"
+#include "peripheral/keyboard.h"
+#include "peripheral/wrapper.h"
 
 struct key_state k_state;
 

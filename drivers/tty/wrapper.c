@@ -1,6 +1,7 @@
 #include "vga.h"
-#include "linux/keyboard.h"
-#include "linux/wrapper.h"
+#include "peripheral/keyboard.h"
+#include "peripheral/wrapper.h"
+#include "peripheral/getty.h"
 
 struct plain_field plain_maps[] = {
 	[KEY_1] = {PLAIN_FLAG_SHIFT, '!', '1'},
@@ -13,8 +14,11 @@ struct plain_field plain_maps[] = {
 	[KEY_8] = {PLAIN_FLAG_SHIFT, '*', '8'},
 	[KEY_9] = {PLAIN_FLAG_SHIFT, '(', '9'},
 	[KEY_0] = {PLAIN_FLAG_SHIFT, ')', '0'},
+
 	[KEY_MINUS] = {PLAIN_FLAG_SHIFT, '_', '-'},
 	[KEY_EQUAL] = {PLAIN_FLAG_SHIFT, '+', '='},
+	[KEY_BACKSPACE] = {0, 0, 0x8},
+	[KEY_TAB] = {0, 0, '\t'},
 	
 	[KEY_Q] = {PLAIN_FLAG_SHIFT | PLAIN_FLAG_CAPSLOCK, 'Q', 'q'},
 	[KEY_W] = {PLAIN_FLAG_SHIFT | PLAIN_FLAG_CAPSLOCK, 'W', 'w'},
@@ -94,6 +98,5 @@ void keyboard_wrapper (uint32_t code)
 		character = plain->upper;
 	if (!character)
 		return ;
-	vga_draw (character, 1);
-	vga_set_cursor ();
+	wrapper_hook (character);
 }

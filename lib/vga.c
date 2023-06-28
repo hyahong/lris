@@ -23,7 +23,7 @@ static void _vga_draw (char character)
 	int index;
 
 	index = sys_vga.cursor.x + sys_vga.cursor.y * VGA_WIDTH;
-	sys_vga.buffer[index] = (*((uint8_t *) &sys_vga.color) << 8) | character;	
+	sys_vga.buffer[index] = (*((uint8_t *) &sys_vga.color) << 8) | character;
 }
 
 /*
@@ -33,6 +33,14 @@ static void _vga_draw_escape (char escape)
 {
 	switch (escape)
 	{
+		/* back space */
+		case 0x8:
+			break;
+
+		/* horizon tab */
+		case 0x9:
+			break;
+
 		/* line feed */
 		case 0xA:
 			vga_lf ();
@@ -95,6 +103,22 @@ static void _vga_set_cursor (uint8_t x, uint8_t y)
 void vga_set_cursor (void)
 {
 	_vga_set_cursor (sys_vga.cursor.x, sys_vga.cursor.y);
+}
+
+void vga_backspace (void)
+{
+	int index;
+
+	index = sys_vga.cursor.x + sys_vga.cursor.y * VGA_WIDTH;
+	sys_vga.buffer[index - 1] = VGA_NULL;
+	if (sys_vga.cursor.x == 0)
+	{
+		/* handling */
+	}
+	else
+	{
+		sys_vga.cursor.x--;
+	}
 }
 
 void vga_lf (void)

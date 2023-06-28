@@ -1,30 +1,33 @@
 #include "vga.h"
-#include "linux/string.h"
-#include "linux/keyboard.h"
-#include "linux/printk.h"
+#include "lris/string.h"
+#include "peripheral/keyboard.h"
+#include "peripheral/getty.h"
+#include "lris/printk.h"
 #include "cpu/interface.h"
+
+char *logo = "\n" \
+"       :::        :::::::::  ::::::::::: ::::::::\n" \
+"      :+:        :+:    :+:     :+:    :+:    :+:\n" \
+"     +:+        +:+    +:+     +:+    +:+\n" \
+"    +#+        +#++:++#:      +#+    +#++:++#++\n" \
+"   +#+        +#+    +#+     +#+           +#+\n" \
+"  #+#        #+#    #+#     #+#    #+#    #+#\n" \
+" ########## ###    ### ########### ########\n";
 
 void kernel_init (void)
 {
-	char *test = "test message thank you and this is test kernel to study referenced \
-				  by KFS-1 now we can boot this kernel with qemu emulator";
-
 	segment_init ();
 	vga_init ();
 	keyboard_init ();
 
-	printk ("test: %X &test: %X\n", test, &test);
-
-	for (int i = 0; i < strlen (test); i++)
-	{
-		vga_draw (test[i], 1);
-		vga_set_color (i % 15, 15 - i % 15);
-	}
-
+	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_LIGHT_CYAN);
+	printk ("%s\n\n\n", logo);
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
-	vga_draw ('.', 1);
-	vga_lf ();
-	vga_set_cursor ();
+
+	char *test = "this is test message. can you find this message in memory using a dump?";
+	printk ("%x\n", test);
+
+	getty_init ();
 
 	while (1)
 	{

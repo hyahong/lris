@@ -1,7 +1,7 @@
 #ifndef _KEYBOARD_H_
 # define _KEYBOARD_H_
 
-# include "linux/key-code.h"
+# include "lris/key-code.h"
 
 # define KEYBOARD_KEYMAP_MAX 128
 # define KEY_NULL 0

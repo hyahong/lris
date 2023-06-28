@@ -7,7 +7,7 @@ LD			= ld
 RM			= rm -rf
 
 ARCH		= arch/i386/boot/boot.asm arch/i386/segment.c
-DRIVERS		= drivers/tty/keyboard.c drivers/tty/wrapper.c
+DRIVERS		= drivers/tty/keyboard.c drivers/tty/wrapper.c drivers/tty/getty.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c
 LIB			= lib/vga.c lib/string.c
