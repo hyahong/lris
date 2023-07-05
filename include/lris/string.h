@@ -7,4 +7,6 @@ int strncmp (const char *str1, const char *str2, uint32_t length);
 char *strchr (const char *str, int c);
 int atoi (const char *str);
 
+void *memset (void *ptr, int value, size_t num);
+
 #endif

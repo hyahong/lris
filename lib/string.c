@@ -113,3 +113,20 @@ int atoi (const char *str)
 
 	return 0;
 }
+
+void *memset (void *ptr, int value, size_t num)
+{
+	int bound;
+	int i;
+
+	bound = num / 4;
+	for (i = 0; i < bound; i++)
+		((int *) ptr)[i] = value;
+	for (i = bound; i < num - bound * 4; i++)
+	{
+		((char *) ptr)[i] = value & 0xFF;
+		value >>= 8;
+	}
+
+	return ptr;
+}

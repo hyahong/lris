@@ -26,11 +26,13 @@ void kernel_init (void)
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 
 	char *test = "this is test message. can you find this message in memory using a dump?";
-	char *test2 = "what...";
+	int test2[5 * 1024] = { 0, };
+	int test3 = 0x42424242;
 
+	printk ("%x\n", test);
 	printk ("%x\n", &test);
-	printk ("%x\n", &test2);
 	printk ("%x\n", test2);
+	printk ("%x\n", &test3);
 
 	getty_init ();
 
