@@ -1,19 +1,24 @@
+TARGET		= i386
+
 ASM			= nasm
 CC			= gcc
 CFLAGS		= -m32 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
 
 LD			= ld
+LDFLAGS		= -m elf_i386
 
 RM			= rm -rf
 
-ARCH		= arch/i386/boot/boot.asm arch/i386/segment.c
-DRIVERS		= drivers/tty/keyboard.c drivers/tty/wrapper.c drivers/tty/getty.c
+ARCH		= arch/$(TARGET)/boot/boot.asm arch/$(TARGET)/segment.c arch/$(TARGET)/vga.c \
+			  arch/$(TARGET)/driver/keyboard.c
+
+DRIVERS		= drivers/tty/wrapper.c drivers/tty/getty.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c
-LIB			= lib/vga.c lib/string.c
+LIB			= lib/string.c
 
 SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB)
-INCS		= -Iinclude -Iarch/i386/include
+INCS		= -Iinclude -Iarch/$(TARGET)/include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))
 OBJS		:= $(filter %.o,$(OBJS))
@@ -21,7 +26,7 @@ OBJS		:= $(filter %.o,$(OBJS))
 BIN			= kfs
 ISO			= kfs.iso
 
-LINKER_CONF	= linker.ld
+LINKER_CONF	= arch/$(TARGET)/boot/setup.ld
 
 all: $(OBJS) $(BIN) pack run
 
@@ -34,7 +39,7 @@ all: $(OBJS) $(BIN) pack run
 	@echo "CC\t" $@
 
 $(BIN):
-	@$(LD) -m elf_i386 -T $(LINKER_CONF) -o $(BIN) $(OBJS)
+	@$(LD) $(LDFLAGS) -T $(LINKER_CONF) -o $(BIN) $(OBJS)
 	@echo "LD\t" $(OBJS)
 
 pack:

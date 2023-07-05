@@ -1,4 +1,5 @@
 #include "vga.h"
+
 #include "lris/stdarg.h"
 #include "lris/string.h"
 #include "lris/printk.h"

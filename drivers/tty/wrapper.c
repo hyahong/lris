@@ -1,5 +1,6 @@
 #include "vga.h"
-#include "peripheral/keyboard.h"
+#include "driver/keyboard.h"
+
 #include "peripheral/wrapper.h"
 #include "peripheral/getty.h"
 

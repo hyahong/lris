@@ -1,9 +1,6 @@
-#ifdef i386
-# include "port.h"
-#else
-# error "this build target is not supported."
-#endif
-#include "peripheral/keyboard.h"
+#include "port.h"
+#include "driver/keyboard.h"
+
 #include "peripheral/wrapper.h"
 
 struct key_state k_state;

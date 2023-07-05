@@ -1,8 +1,5 @@
-#ifdef i386
-# include "cpu/interface.h"
-#else
-# error "this build target is not supported."
-#endif
+#include "cpu/interface.h"
+
 #include "lris/printk.h"
 
 gdt_entry_t *gdt;

@@ -1,9 +1,5 @@
 #include "vga.h"
-#ifdef i386
-# include "port.h"
-#else
-# error "this build target is not supported."
-#endif
+#include "port.h"
 
 struct vga sys_vga;
 

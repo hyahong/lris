@@ -1,4 +1,6 @@
+#include "port.h"
 #include "vga.h"
+
 #include "peripheral/getty.h"
 #include "lris/string.h"
 #include "lris/printk.h"
@@ -47,7 +49,7 @@ void wrapper_hook (char character)
 /*
  * command execute area
  */
-void getty_cmd_dump (char *address)
+void getty_pdump (char *address)
 {
 	const unsigned char *addr;
 	char *hex = "0123456789ABCDEF";
@@ -56,7 +58,7 @@ void getty_cmd_dump (char *address)
 
 	addr = (const unsigned char *) atoi (address);
 	/* format */
-	printk ("Address      00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n");
+	printk ("P:Address    00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n");
 	for (i = 0; i < 8; i++)
 	{
 		/* field */
@@ -93,7 +95,11 @@ void getty_command (char *command[])
 {
 	if (!strcmp (command[0], "dump"))
 	{
-		getty_cmd_dump (command[1]);
+		getty_pdump (command[1]);
+	}
+	else if (!strcmp (command[0], "shutdown"))
+	{
+		outw (0x604, 0x2000);
 	}
 }
 
