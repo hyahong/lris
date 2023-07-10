@@ -5,6 +5,7 @@
 #include "lris/string.h"
 #include "lris/printk.h"
 #include "peripheral/getty.h"
+#include "lris/assert.h"
 
 char *logo = "\n" \
 "       :::        :::::::::  ::::::::::: ::::::::\n" \
@@ -26,13 +27,8 @@ void kernel_init (void)
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 
 	char *test = "this is test message. can you find this message in memory using a dump?";
-	int test2[5 * 1024] = { 0, };
-	int test3 = 0x42424242;
 
 	printk ("%x\n", test);
-	printk ("%x\n", &test);
-	printk ("%x\n", test2);
-	printk ("%x\n", &test3);
 
 	getty_init ();
 
