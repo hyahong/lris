@@ -2,29 +2,32 @@ TARGET		= i386
 
 ASM			= nasm
 CC			= gcc
-CFLAGS		= -m32 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs
+CFLAGS		= -m32 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs -g#debug
 
 LD			= ld
 LDFLAGS		= -m elf_i386
 
 RM			= rm -rf
 
-ARCH		= arch/$(TARGET)/boot/boot.asm arch/$(TARGET)/segment.c arch/$(TARGET)/vga.c \
-			  arch/$(TARGET)/driver/keyboard.c
+ARCH		= arch/$(TARGET)/boot/boot.asm arch/$(TARGET)/boot/init.c \
+			  arch/$(TARGET)/interrupt.c \
+			  arch/$(TARGET)/mm/segment.c arch/$(TARGET)/mm/page.c \
+			  arch/$(TARGET)/driver/keyboard.c arch/$(TARGET)/driver/vga.c
 
 DRIVERS		= drivers/tty/wrapper.c drivers/tty/getty.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c
 LIB			= lib/string.c
+MM			= mm/memory.c mm/zone.c
 
-SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB)
+SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB) $(MM)
 INCS		= -Iinclude -Iarch/$(TARGET)/include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))
 OBJS		:= $(filter %.o,$(OBJS))
 
-BIN			= kfs
-ISO			= kfs.iso
+BIN			= lris
+ISO			= lris.iso
 
 LINKER_CONF	= arch/$(TARGET)/boot/setup.ld
 
@@ -48,10 +51,15 @@ pack:
 	@cp $(BIN) iso/boot
 	@cp grub.cfg iso/boot/grub
 	@grub-mkrescue -o $(ISO) iso
-	@$(RM) $(BIN) iso
+# debug
+	@objcopy --only-keep-debug lris lris.sym
+#@$(RM) $(BIN) iso
 
 run:
-	@qemu-system-i386 -cdrom $(ISO)
+	@qemu-system-i386 -smp 1 -m 4G -cdrom $(ISO) -s 
+
+asm:
+	@$(CC) $(CFLAGS) $(INCS) -o $(SRC).s -S $(SRC).c
 
 clean:
 	$(RM) $(OBJS)

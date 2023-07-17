@@ -91,11 +91,51 @@ void getty_pdump (char *address)
 	vga_set_cursor ();
 }
 
+void getty_page (char *command[])
+{
+	if (!command[1])
+		return ;
+
+	if (!strcmp (command[1], "off"))
+	{
+		asm volatile (
+		".intel_syntax			\n\t"
+		"mov %%eax, %%cr0		\n\t"
+		"xor %%eax, 0x80000000	\n\t"
+		"mov %%cr0, %%eax		\n\t"
+		".att_syntax			\n\t"
+		: :
+		);
+		printk ("paging off\n");
+	}
+	else if (!strcmp (command[1], "on"))
+	{
+		asm volatile (
+		".intel_syntax			\n\t"
+		"mov %%eax, %%cr0		\n\t"
+		"or %%eax, 0x80000000	\n\t"
+		"mov %%cr0, %%eax		\n\t"
+		".att_syntax			\n\t"
+		: :
+		);
+		printk ("paging on\n");
+	}
+	else if (!strcmp (command[1], "fault"))
+	{
+		int *addr = 0x500000;
+		*addr = 1;
+	}
+}
+
 void getty_command (char *command[])
 {
 	if (!strcmp (command[0], "dump"))
 	{
 		getty_pdump (command[1]);
+	}
+	else if (!strcmp (command[0], "page"))
+	{
+		getty_page (command);
 	}
 	else if (!strcmp (command[0], "shutdown"))
 	{
@@ -105,7 +145,7 @@ void getty_command (char *command[])
 
 void getty_parse (void)
 {
-	char *command[8] = { 0, };
+	char *command[16] = { 0, };
 	char *cursor;
 	int i, j;
 	

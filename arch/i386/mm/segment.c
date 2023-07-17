@@ -1,11 +1,17 @@
-#include "cpu/interface.h"
+/*
+ * To perform memory initialization first, this code is located in
+ * .inittext SECTION and .initdata SECTION.
+ */
 
-#include "lris/printk.h"
+#include "cpu/segment.h"
 
-gdt_entry_t *gdt;
-gdt_ptr_t gdt_ptr;
+#define TEXT_SECTION __attribute__((section(".inittext")))
+#define DATA_SECTION __attribute__((section(".initdata")))
 
-static void gdt_set_entry (uint16_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t flag)
+static gdt_entry_t *gdt DATA_SECTION;
+static gdt_ptr_t gdt_ptr DATA_SECTION;
+
+static void TEXT_SECTION gdt_set_entry (uint16_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t flag)
 {
 	gdt_entry_t *entry;
 
@@ -20,7 +26,7 @@ static void gdt_set_entry (uint16_t index, uint32_t base, uint32_t limit, uint8_
 	entry->flag = flag;
 }
 
-static void segment_flush (void)
+static void TEXT_SECTION segment_flush (void)
 {
 	gdt_ptr.base = (uint32_t) gdt;
 	gdt_ptr.limit = 7 * sizeof (gdt_entry_t) - 1;
@@ -42,8 +48,23 @@ static void segment_flush (void)
 		  "r"(SEG_SELECTOR_KERNEL_STACK)
 	);	
 }
-extern void gdt_flush (uint32_t ptr);
-void segment_init (void)
+
+void TEXT_SECTION segment_paging_flush (void)
+{
+	gdt_ptr.base = (uint32_t) gdt + 0xC0000000;
+	gdt_ptr.limit = 7 * sizeof (gdt_entry_t) - 1;
+
+	asm volatile (
+		".intel_syntax	\n\t"
+		"mov %%eax, %0	\n\t"
+		"lgdt [%%eax]	\n\t"
+		".att_syntax	\n\t"
+		: /* output */
+		: "r"(&gdt_ptr)
+	);
+}
+
+void TEXT_SECTION segment_init (void)
 {
 	gdt = (gdt_entry_t *) GDT_BASE_ADDRESS;
 

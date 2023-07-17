@@ -1,5 +1,5 @@
-#ifndef _SEGMENT_H_
-# define _SEGMENT_H_
+#ifndef _CPU_SEGMENT_H_
+# define _CPU_SEGMENT_H_
 
 # include "lris/types.h"
 
@@ -77,15 +77,16 @@
 #define SEG_SELECTOR_KERNEL_STACK	SEG_SELECTOR_INDEX(GDT_ENTRY_KERNEL_SS) | \
 									SEG_SELECTOR_INDICATOR(0) | SEG_SELECTOR_RPL(0)
 
+/* segmentation */
 typedef struct gdt_entry_struct gdt_entry_t;
 struct gdt_entry_struct
 {
-	uint32_t limit_low:16;
-	uint32_t base_low:24;
-	uint32_t access:8;
-	uint32_t limit_high:4;
-	uint32_t flag:4;
-	uint32_t base_high:8;
+	uint32_t limit_low	:16;
+	uint32_t base_low	:24;
+	uint32_t access		:8;
+	uint32_t limit_high	:4;
+	uint32_t flag		:4;
+	uint32_t base_high	:8;
 } __attribute__((packed));
 
 typedef struct gdt_ptr_struct gdt_ptr_t;
@@ -96,5 +97,6 @@ struct gdt_ptr_struct
 } __attribute__((packed));
 
 void segment_init (void);
+void segment_paging_flush (void);
 
 #endif

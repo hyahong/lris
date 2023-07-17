@@ -1,6 +1,8 @@
 #include "vga.h"
 #include "driver/keyboard.h"
-#include "cpu/interface.h"
+#include "cpu/segment.h"
+#include "cpu/page.h"
+#include "cpu/interrupt.h"
 
 #include "lris/string.h"
 #include "lris/printk.h"
@@ -18,7 +20,7 @@ char *logo = "\n" \
 
 void kernel_init (void)
 {
-	segment_init ();
+	interrupt_init ();
 	vga_init ();
 	keyboard_init ();
 
@@ -28,7 +30,7 @@ void kernel_init (void)
 
 	char *test = "this is test message. can you find this message in memory using a dump?";
 
-	printk ("%x\n", test);
+	printk ("%x %x\n", test, &test);
 
 	getty_init ();
 

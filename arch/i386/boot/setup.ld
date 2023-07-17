@@ -4,28 +4,41 @@ ENTRY(start)
 
 SECTIONS
 {
+	/* virtual memory address offset (higher half) */
+	VMA_OFFSET = 0;/*0xC0000000;
 	/* conventional address for kernel */
-	. = 1M;
+	. = 0x100000;
 	
-	.text BLOCK(4K) : ALIGN(4K)
+	.header				: { *(.header) }
+	.inittext			:
+	{ 
+		*(.inittext)
+		*(*.__x86.get_pc_thunk.*)
+	}
+	.initdata			: { *(.initdata) }
+
+	/* to map a kernel virtual address, uses 0xC0000000 */
+	. += VMA_OFFSET;
+
+	.text ALIGN(4K)		: AT (ADDR (.text) - VMA_OFFSET)
 	{
-		*(.header)
 		*(.text)
 	}
 	
-	.rodata BLOCK(4K) : ALIGN(4K)
+	.rodata ALIGN(4K)	: AT (ADDR (.rodata) - VMA_OFFSET)
 	{
 		*(.rodata)
 	}
 
-	.data BLOCK(4K) : ALIGN(4K)
+	.data ALIGN(4K)		: AT (ADDR (.data) - VMA_OFFSET)
 	{
 		*(.data)
 	}
 
-	.bss BLOCK(4K) : ALIGN(4K)
+	.bss ALIGN(4K)		: AT (ADDR (.bss) - VMA_OFFSET)
 	{
-		*(.bss)
 		*(COMMON)
+		*(.bss)
 	}
+
 }

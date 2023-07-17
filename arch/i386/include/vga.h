@@ -8,7 +8,7 @@
 
 # define VGA_NULL 1824
 
-# define VGA_BASE_ADDRESS 0xB8000
+# define VGA_BASE_ADDRESS 0xC00B8000
 
 struct vga
 {

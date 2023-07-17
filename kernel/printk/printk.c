@@ -1,5 +1,6 @@
 #include "vga.h"
 
+#include "lris/assert.h"
 #include "lris/stdarg.h"
 #include "lris/string.h"
 #include "lris/printk.h"
@@ -167,6 +168,7 @@ int printk (const char *format, ...)
 	va_start (args, format);
 	printk_info_init (&info, format);
 
+	/*
 	while (*info.format)
 	{
 		if (*info.format == '%')
@@ -180,12 +182,15 @@ int printk (const char *format, ...)
 			info.format++;
 		}
 	}
+	*/
 
 	va_end (args);
 
+	strncpy (info.buffer, format, strlen (format));
+	info.offset = strlen (format);
 	for (i = 0; i < info.offset; i++)
 		vga_draw (info.buffer[i], 1);
 	vga_set_cursor ();
 
-	return 0;
+	return info.offset;
 }

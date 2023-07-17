@@ -12,6 +12,15 @@ unsigned int strlen (const char *str)
 	return length;
 }
 
+char *strncpy (char *dest, const char *origin, size_t n)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+		dest[i] = origin[i];
+	return dest;
+}
+
 int strcmp (const char *str1, const char *str2)
 {
 	while (*str1 && *str2 && *str1 == *str2)
