@@ -2,14 +2,17 @@ TARGET		= i386
 
 ASM			= nasm
 CC			= gcc
-CFLAGS		= -m32 -fno-builtin -fno-exceptions -fno-stack-protector -nostdlib -nodefaultlibs -g#debug
+CFLAGS		= -m32 -fno-builtin -fno-exceptions \
+			  -fno-stack-protector -nostdlib -nodefaultlibs \
+			  -ffreestanding \
+			  -g3
 
 LD			= ld
 LDFLAGS		= -m elf_i386
 
 RM			= rm -rf
 
-ARCH		= arch/$(TARGET)/boot/boot.asm arch/$(TARGET)/boot/init.c \
+ARCH		= arch/$(TARGET)/boot/boot.asm \
 			  arch/$(TARGET)/interrupt.c \
 			  arch/$(TARGET)/mm/segment.c arch/$(TARGET)/mm/page.c \
 			  arch/$(TARGET)/driver/keyboard.c arch/$(TARGET)/driver/vga.c
@@ -51,8 +54,6 @@ pack:
 	@cp $(BIN) iso/boot
 	@cp grub.cfg iso/boot/grub
 	@grub-mkrescue -o $(ISO) iso
-# debug
-	@objcopy --only-keep-debug lris lris.sym
 #@$(RM) $(BIN) iso
 
 run:

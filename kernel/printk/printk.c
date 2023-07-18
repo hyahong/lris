@@ -35,6 +35,7 @@ static void printk_buffer_write (struct printk_info *info, char *str, int length
 
 static void printk_parse_flags (struct printk_info *info)
 {
+	char *flags = "xXcsd";
 	int i;
 
 	i = 0;
@@ -46,7 +47,7 @@ static void printk_parse_flags (struct printk_info *info)
 		info->format++;
 	}
 	/* width flag */
-	while ((int) strchr ("xXcsd", info->format[i]) < 0)
+	while (i < strlen (info->format) && !strchr (flags, info->format[i]))
 		++i;
 	if (i != 1)
 	{
@@ -168,7 +169,6 @@ int printk (const char *format, ...)
 	va_start (args, format);
 	printk_info_init (&info, format);
 
-	/*
 	while (*info.format)
 	{
 		if (*info.format == '%')
@@ -182,12 +182,9 @@ int printk (const char *format, ...)
 			info.format++;
 		}
 	}
-	*/
 
 	va_end (args);
 
-	strncpy (info.buffer, format, strlen (format));
-	info.offset = strlen (format);
 	for (i = 0; i < info.offset; i++)
 		vga_draw (info.buffer[i], 1);
 	vga_set_cursor ();

@@ -5,7 +5,7 @@ struct vga sys_vga;
 
 void vga_init (void)
 {
-	/* VGA Video RAM address B800:0000 */
+	/* VGA Video RAM address */
 	sys_vga.buffer = (uint16_t *) VGA_BASE_ADDRESS;
 	sys_vga.cursor.x = 0;
 	sys_vga.cursor.y = 0;

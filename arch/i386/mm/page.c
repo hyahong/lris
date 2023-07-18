@@ -1,15 +1,7 @@
-/*
- * To perform memory initialization first, this code is located in
- * .inittext SECTION and .initdata SECTION.
- */
-
 #include "cpu/page.h"
 
 #include "lris/string.h"
 #include "lris/assert.h"
-
-#define TEXT_SECTION __attribute__((section(".inittext")))
-#define DATA_SECTION __attribute__((section(".initdata")))
 
 /* directory and table must be aligned for 4K */
 uint32_t page_directory[1024]

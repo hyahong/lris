@@ -3,7 +3,7 @@
 
 # include "lris/types.h"
 
-# define GDT_BASE_ADDRESS 0x800
+# define GDT_BASE_ADDRESS 0xC0000800
 
 # define GDT_ENTRY_KERNEL_CS	1
 # define GDT_ENTRY_KERNEL_DS	2
@@ -97,6 +97,5 @@ struct gdt_ptr_struct
 } __attribute__((packed));
 
 void segment_init (void);
-void segment_paging_flush (void);
 
 #endif

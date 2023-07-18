@@ -20,11 +20,13 @@ char *logo = "\n" \
 
 void kernel_init (void)
 {
+	segment_init ();
 	interrupt_init ();
 	vga_init ();
 	keyboard_init ();
 
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_LIGHT_CYAN);
+
 	printk ("%s\n\n\n", logo);
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 

@@ -55,7 +55,7 @@ char *strchr (const char *str, int c)
 			return (char *) str;
 		str++;
 	}
-	return (char *) -1;
+	return (char *) NULL;
 }
 
 static int atoi_hex (const char *str)
@@ -67,14 +67,14 @@ static int atoi_hex (const char *str)
 	int i, j;
 	
 	result = 0;
-	for (i = 0; (int) strchr (hex_lower, str[i]) >= 0 || (int) strchr (hex_upper, str[i]) >= 0; i++)
+	for (i = 0; strchr (hex_lower, str[i]) || strchr (hex_upper, str[i]); i++)
 	{
 		/* raise position */
 		result *= 16;
 		/* get digit */
 		hex = hex_lower;
 		offset = strchr (hex, str[i]);
-		if ((int) offset < 0)
+		if (!offset)
 		{
 			hex = hex_upper;
 			offset = strchr (hex, str[i]);
@@ -96,7 +96,7 @@ static int atoi_dec (const char *str)
 		str++;
 	}
 	result = 0;
-	for (i = 0; (int) strchr ("0123456789", str[i]) >= 0; i++)
+	for (i = 0; strchr ("0123456789", str[i]); i++)
 	{
 		result *= 10;
 		result += str[i] - '0';
