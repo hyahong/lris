@@ -1,4 +1,4 @@
-#include "vga.h"
+#include "driver/vga.h"
 #include "driver/keyboard.h"
 
 #include "peripheral/wrapper.h"

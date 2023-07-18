@@ -16,6 +16,9 @@
 # define USER_PAGE_COUNT (USER_MEMORY_SIZE / PAGE_SIZE)
 # define PAGE_COUNT (KERNEL_PAGE_COUNT + USER_PAGE_COUNT)
 
+# define VMA_OFFSET 0xC0000000
+# define NORMAL_ZONE_PAGE_COUNT 229376
+
 # define PAGE_DIRECTORY_COUNT 1024
 # define PAGE_TABLE_COUNT 1024
 
@@ -79,6 +82,22 @@ struct page_table
 	uint32_t physical	: 20;
 } __attribute__((packed));
 
-void page_init (void);
+/* frame */
+typedef struct page page_t;
+struct page
+{
+	uint8_t flags;
+	uint8_t _refcount;
+
+	void *virtual;
+} __attribute__((packed));
+
+/* extern */
+extern char _kernel_end;
+
+extern int *page_directory;
+extern int *page_tables;
+
+void paging_init (void);
 
 #endif

@@ -1,5 +1,5 @@
 #include "port.h"
-#include "vga.h"
+#include "driver/vga.h"
 
 #include "peripheral/getty.h"
 #include "lris/string.h"

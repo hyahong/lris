@@ -1,4 +1,4 @@
-#include "vga.h"
+#include "driver/vga.h"
 
 #include "lris/assert.h"
 #include "lris/stdarg.h"

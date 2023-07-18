@@ -1,4 +1,4 @@
-#include "vga.h"
+#include "driver/vga.h"
 #include "port.h"
 
 struct vga sys_vga;

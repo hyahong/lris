@@ -1,7 +1,7 @@
-#include "vga.h"
+#include "driver/vga.h"
 #include "driver/keyboard.h"
 #include "cpu/segment.h"
-#include "cpu/page.h"
+#include "cpu/paging.h"
 #include "cpu/interrupt.h"
 
 #include "lris/string.h"
@@ -21,12 +21,15 @@ char *logo = "\n" \
 void kernel_init (void)
 {
 	segment_init ();
+	paging_init ();
 	interrupt_init ();
 	vga_init ();
 	keyboard_init ();
 
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_LIGHT_CYAN);
 
+	printk ("%x\n", &_kernel_end);
+	printk ("%x\n", USER_MEMORY_SIZE);
 	printk ("%s\n\n\n", logo);
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 

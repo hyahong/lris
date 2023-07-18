@@ -14,7 +14,7 @@ RM			= rm -rf
 
 ARCH		= arch/$(TARGET)/boot/boot.asm \
 			  arch/$(TARGET)/interrupt.c \
-			  arch/$(TARGET)/mm/segment.c arch/$(TARGET)/mm/page.c \
+			  arch/$(TARGET)/mm/segment.c arch/$(TARGET)/mm/paging.c \
 			  arch/$(TARGET)/driver/keyboard.c arch/$(TARGET)/driver/vga.c
 
 DRIVERS		= drivers/tty/wrapper.c drivers/tty/getty.c

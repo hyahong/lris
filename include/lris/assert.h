@@ -1,7 +1,7 @@
 #ifndef _ASSERT_H_
 # define _ASSERT_H_
 
-# include "vga.h"
+# include "driver/vga.h"
 
 # include "lris/string.h"
 

@@ -96,6 +96,8 @@ struct gdt_ptr_struct
 	uint32_t base;
 } __attribute__((packed));
 
+
+/* extern */
 void segment_init (void);
 
 #endif
