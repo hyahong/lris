@@ -4,35 +4,37 @@
 #include "lris/printk.h"
 #include "lris/assert.h"
 
-page_directory_t *page_directory;
-page_table_t *page_tables;
+page_directory_t *mm_page_directory;
+page_table_t *mm_page_tables;
 
-struct page mm_frames[1024 * 1024];
+struct page mm_pages[PAGE_DIRECTORY_COUNT * PAGE_TABLE_COUNT];
 
-/*
- * This function maps the kernel area (in physical address, 0~896 MB)
- * to virtual address (0xC0000000 ~ )
- */
-static void paging_init_mapping (void)
+static void paging_frame_init (void)
 {
 	int i;
 
-	page_directory = (page_directory_t *) &_init_page_directory;
-	page_tables = (page_table_t *) &_init_page_tables;
-	/* first 1024 pages have already been mapped */
-	/* table mapping */
-	for (i = 1024; i < NORMAL_ZONE_PAGE_COUNT; i++)
-		((int *) page_tables)[i] = (PAGE_SIZE * i) | PG_WRITABLE | PG_PRESENT;
-	/* directory mapping */
-	for (i = 1; i < NORMAL_ZONE_PAGE_COUNT / 1024; i++)
-		((int *) page_directory)[i + 768] = ((int) &page_tables - VMA_OFFSET + i * 4096) | PG_WRITABLE | PG_PRESENT;
-
-	/* do not need to flush a TLB */
+	mm_page_directory = (page_directory_t *) &_init_page_directory;
+	mm_page_tables = (page_table_t *) &_init_page_tables;
+	
+	/* normal zone in physical */
+	for (i = 0; i < NORMAL_ZONE_PAGE_COUNT; i++)
+	{
+		mm_pages[i].flags = PG_reserved;
+		mm_pages[i]._refcount = 1;
+		mm_pages[i].virtual = VMA_OFFSET + i * PAGE_SIZE;
+	}
+	/* unused in physical */
+	for (i = NORMAL_ZONE_PAGE_COUNT; i < PAGE_COUNT; i++)
+	{
+		mm_pages[i].flags = 0;
+		mm_pages[i]._refcount = 0;
+		mm_pages[i].virtual = 0;
+	}
 }
 
 static void *page_address (const struct page *page)
 {
-	
+	return 0;
 }
 
 static void set_page_address(struct page *page, void *address)
@@ -41,7 +43,7 @@ static void set_page_address(struct page *page, void *address)
 
 void paging_init (void)
 {
-	paging_init_mapping ();
+	paging_frame_init ();
 
-	klog ("Remapped %d pages for paging", NORMAL_ZONE_PAGE_COUNT);
+	klog ("Initialized %d pages for paging", NORMAL_ZONE_PAGE_COUNT);
 }

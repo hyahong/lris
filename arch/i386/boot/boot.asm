@@ -3,11 +3,13 @@ MMAGIC equ 0x1BADB002
 MFLAGS equ 0x3
 CHECKSUM equ -(MMAGIC + MFLAGS)
 ; MACRO
-STACK_SIZE equ 16384
 VMA_OFFSET equ 0xC0000000
-PAGE_STRUCT_SIZE equ 6
+STACK_SIZE equ 16384
+
 PAGE_SIZE equ 4096
 PAGE_COUNT equ 1024 * 1024
+KERNEL_NORMAL_PAGE_COUNT equ 229376
+KERNEL_NORMAL_DIR_COUNT equ 224
 
 
 ; multiboot header
@@ -27,12 +29,12 @@ global _init_page_tables
 ; page tables
 align 4096
 _init_page_directory:
-	dd 1024
+	times 1024 dd 0
 _init_page_table_low:
-	dd 1024
+	times 1024 dd 0
 ; mapping up to normal zone (896 MB)
 _init_page_tables:
-	dd 229376
+	times KERNEL_NORMAL_PAGE_COUNT dd 0
 
 
 ; inittext section
@@ -51,33 +53,54 @@ start:
 
 boot_paging:
 	; physical offset
-	mov eax, 0
+	; flags
+	mov eax, 0x03
 	; count
 	mov ecx, 0
 
 fill_page:
 	; mapping
-	mov ebx, eax
-	; flags
-	or ebx, 0x03
-	mov dword [_init_page_table_low + ecx * 4], ebx
-	mov dword [_init_page_tables + ecx * 4], ebx
+	; lower half kerenl mapping
+	mov dword [_init_page_table_low + ecx * 4], eax
+	; higher half kerenl mapping
+	mov dword [_init_page_tables + ecx * 4], eax
 	; move offset
 	add eax, PAGE_SIZE
 	add ecx, 1
 
-	cmp eax, PAGE_SIZE * 1024
+	cmp ecx, 1024
 	jne fill_page
 
+fill_page_higher: 
+	; mapping
+	; higher half kerenl mapping
+	mov dword [_init_page_tables + ecx * 4], eax
+	; move offset
+	add eax, PAGE_SIZE
+	add ecx, 1
+
+	cmp ecx, KERNEL_NORMAL_PAGE_COUNT
+	jne fill_page_higher
+
 fill_directory:
+	mov ecx, 0
 	; 0 ~ 4 MB
-	mov ebx, _init_page_table_low
-	or ebx, 0x03
-	mov dword [_init_page_directory], ebx
+	mov eax, _init_page_table_low
+	or eax, 0x03
+	mov dword [_init_page_directory], eax
 	; 3 GB ~ 3 GB + 4 MB
-	mov ebx, _init_page_tables
-	or ebx, 0x03
-	mov dword [_init_page_directory + 768 * 4], ebx
+	mov eax, _init_page_tables
+	or eax, 0x03
+	mov dword [_init_page_directory + 768 * 4], eax
+
+fill_directory_higher:
+	; 3 GB + ecx * 4 MB ~ 3 GB + (ecx + 1) * 4 MB
+	add eax, 4096
+	add ecx, 1
+	mov dword [_init_page_directory + (ecx + 768) * 4], eax
+	
+	cmp ecx, KERNEL_NORMAL_DIR_COUNT
+	jne fill_directory_higher
 
 enable_paging:
 	mov eax, _init_page_directory

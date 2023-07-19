@@ -16,7 +16,7 @@
 # define USER_PAGE_COUNT (USER_MEMORY_SIZE / PAGE_SIZE)
 # define PAGE_COUNT (KERNEL_PAGE_COUNT + USER_PAGE_COUNT)
 
-# define VMA_OFFSET 0xC0000000
+# define VMA_OFFSET USER_MEMORY_SIZE
 # define NORMAL_ZONE_PAGE_COUNT 229376
 
 # define PAGE_DIRECTORY_COUNT 1024
@@ -48,6 +48,10 @@
 /* PS */
 # define PG_PAGE 0 << 7
 # define PG_BIGPAGE 1 << 7
+
+/* struct page flags */
+# define PG_reserved 1 << 0
+# define PG_some 1 << 1
 
 /* paging directory */
 typedef struct page_directory page_directory_t;
