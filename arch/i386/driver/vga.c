@@ -1,6 +1,8 @@
 #include "driver/vga.h"
 #include "port.h"
 
+#include "lris/printk.h"
+
 struct vga sys_vga;
 
 void vga_init (void)
@@ -12,6 +14,8 @@ void vga_init (void)
 	/* default color: block background and white foreground */
 	sys_vga.color.back = VGA_COLOR_BLACK;
 	sys_vga.color.fore = VGA_COLOR_WHITE;
+
+	klog ("Initialized Video Graphics Array");
 }
 
 static void _vga_draw (char character)

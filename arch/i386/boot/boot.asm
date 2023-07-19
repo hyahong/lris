@@ -18,6 +18,23 @@ align 4
 	dd CHECKSUM
 
 
+; initdata section
+section .initdata
+
+global _init_page_directory
+global _init_page_tables
+
+; page tables
+align 4096
+_init_page_directory:
+	dd 1024
+_init_page_table_low:
+	dd 1024
+; mapping up to normal zone (896 MB)
+_init_page_tables:
+	dd 229376
+
+
 ; inittext section
 section .inittext
 global start
@@ -43,8 +60,8 @@ fill_page:
 	mov ebx, eax
 	; flags
 	or ebx, 0x03
-	mov dword [page_table_low - VMA_OFFSET + ecx * 4], ebx
-	mov dword [page_tables - VMA_OFFSET + ecx * 4], ebx
+	mov dword [_init_page_table_low + ecx * 4], ebx
+	mov dword [_init_page_tables + ecx * 4], ebx
 	; move offset
 	add eax, PAGE_SIZE
 	add ecx, 1
@@ -54,16 +71,16 @@ fill_page:
 
 fill_directory:
 	; 0 ~ 4 MB
-	mov ebx, page_table_low - VMA_OFFSET
+	mov ebx, _init_page_table_low
 	or ebx, 0x03
-	mov dword [page_directory - VMA_OFFSET], ebx
+	mov dword [_init_page_directory], ebx
 	; 3 GB ~ 3 GB + 4 MB
-	mov ebx, page_tables - VMA_OFFSET
+	mov ebx, _init_page_tables
 	or ebx, 0x03
-	mov dword [page_directory - VMA_OFFSET + 768 * 4], ebx
+	mov dword [_init_page_directory + 768 * 4], ebx
 
 enable_paging:
-	mov eax, page_directory - VMA_OFFSET
+	mov eax, _init_page_directory
 	mov cr3, eax
  
 	mov eax, cr0
@@ -76,25 +93,11 @@ enable_paging:
 ; bss section
 section .bss
 
-global page_directory
-global page_tables
-
 ; stack
 virtual_stack:
 align 16
 	resb STACK_SIZE
-; page tables
-align 4096
-page_directory:
-	resd 1024
-page_table_low:
-	resd 1024
-; mapping up to normal zone (896 MB)
-page_tables:
-	resd 229376
-; frames
-mm_frames:
-	resb PAGE_STRUCT_SIZE * PAGE_COUNT
+
 
 ; text section
 section .text
@@ -104,7 +107,7 @@ extern kernel_init
 
 clean_start:
 	; unmap the identity mapping
-	mov dword [page_directory], 0
+	mov dword [_init_page_directory + VMA_OFFSET], 0
 
 	; flush a TLB
 	mov eax, cr3

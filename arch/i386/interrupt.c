@@ -2,6 +2,7 @@
 #include "cpu/interrupt.h"
 
 #include "lris/string.h"
+#include "lris/printk.h"
 
 idt_entry_t idt_entry[256];
 idt_ptr_t idt_ptr;
@@ -65,4 +66,6 @@ void interrupt_init (void)
 	idt_entry[14].offset_high = ((uint32_t) irq14) >> 16;
 
 	interrupt_register ();
+
+	klog ("Initialized interrupt routine");
 }

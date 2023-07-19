@@ -1,6 +1,7 @@
 #include "port.h"
 #include "driver/keyboard.h"
 
+#include "lris/printk.h"
 #include "peripheral/wrapper.h"
 
 struct key_state k_state;
@@ -13,6 +14,8 @@ void keyboard_init (void)
 		k_state.key_maps[i] = KEY_NULL; 
 	k_state.shift = 0;
 	k_state.ledstate = 0;
+
+	klog ("Initialized keyboard setting");
 }
 
 static void keyboard_press (uint32_t code)

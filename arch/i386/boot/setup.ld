@@ -11,6 +11,7 @@ SECTIONS
 	
 	.header				: { *(.header) }
 	.inittext			: { *(.inittext) }
+	.initdata			: { *(.initdata) }
 
 	/* to map a kernel virtual address, uses 0xC0000000 */
 	. += VMA_OFFSET;

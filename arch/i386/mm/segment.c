@@ -1,5 +1,7 @@
 #include "cpu/segment.h"
 
+#include "lris/printk.h"
+
 gdt_entry_t *gdt;
 gdt_ptr_t gdt_ptr;
 
@@ -68,4 +70,6 @@ void segment_init (void)
 	 * Load Segment
 	 */
 	segment_flush ();
+
+	klog ("Initialized Segmentation");
 }

@@ -83,7 +83,6 @@ struct page_table
 } __attribute__((packed));
 
 /* frame */
-typedef struct page page_t;
 struct page
 {
 	uint8_t flags;
@@ -95,8 +94,8 @@ struct page
 /* extern */
 extern char _kernel_end;
 
-extern int *page_directory;
-extern int *page_tables;
+extern int *_init_page_directory;
+extern int *_init_page_tables;
 
 void paging_init (void);
 

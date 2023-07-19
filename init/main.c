@@ -20,22 +20,15 @@ char *logo = "\n" \
 
 void kernel_init (void)
 {
+	vga_init ();
 	segment_init ();
 	paging_init ();
 	interrupt_init ();
-	vga_init ();
 	keyboard_init ();
 
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_LIGHT_CYAN);
-
-	printk ("%x\n", &_kernel_end);
-	printk ("%x\n", USER_MEMORY_SIZE);
-	printk ("%s\n\n\n", logo);
+	printk ("\n\n%s\n\n\n", logo);
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
-
-	char *test = "this is test message. can you find this message in memory using a dump?";
-
-	printk ("%x %x\n", test, &test);
 
 	getty_init ();
 

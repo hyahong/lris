@@ -191,3 +191,44 @@ int printk (const char *format, ...)
 
 	return info.offset;
 }
+
+int vprintk (const char *format, va_list args)
+{
+	struct printk_info info;
+	int i;
+
+	printk_info_init (&info, format);
+
+	while (*info.format)
+	{
+		if (*info.format == '%')
+		{
+			printk_parse_flags (&info);
+			printk_write_argument (&info, &args);
+		}
+		else
+		{
+			printk_buffer_write (&info, (char *) info.format, 1);
+			info.format++;
+		}
+	}
+
+	for (i = 0; i < info.offset; i++)
+		vga_draw (info.buffer[i], 1);
+	vga_set_cursor ();
+
+	return info.offset;
+}
+
+void klog (const char *format, ...)
+{
+	va_list args;
+
+	va_start (args, format);
+
+	printk ("[timestamp] ");
+	vprintk (format, args);
+	printk ("\n");
+	
+	va_end (args);
+}
