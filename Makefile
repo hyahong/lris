@@ -17,13 +17,15 @@ ARCH		= arch/$(TARGET)/boot/boot.asm \
 			  arch/$(TARGET)/mm/segment.c arch/$(TARGET)/mm/paging.c \
 			  arch/$(TARGET)/driver/keyboard.c arch/$(TARGET)/driver/vga.c
 
+UNITTEST	= unittest/main.c unittest/list.c
+
 DRIVERS		= drivers/tty/wrapper.c drivers/tty/getty.c
 INIT		= init/main.c
-KERNEL		= kernel/printk/printk.c
+KERNEL		= kernel/printk/printk.c kernel/assert.c kernel/list.c
 LIB			= lib/string.c
 MM			= mm/memory.c mm/zone.c
 
-SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB) $(MM)
+SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB) $(MM) $(UNITTEST)
 INCS		= -Iinclude -Iarch/$(TARGET)/include
 
 OBJS		= $(patsubst %.asm,%.o,$(SRCS)) $(patsubst %.c,%.o,$(SRCS))
@@ -58,9 +60,6 @@ pack:
 
 run:
 	@qemu-system-i386 -smp 1 -m 4G -cdrom $(ISO) -s 
-
-asm:
-	@$(CC) $(CFLAGS) $(INCS) -o $(SRC).s -S $(SRC).c
 
 clean:
 	$(RM) $(OBJS)

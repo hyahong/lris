@@ -86,6 +86,22 @@ struct page_table
 	uint32_t physical	: 20;
 } __attribute__((packed));
 
+/* mmpage */
+/* whole memory mapping structure */
+typedef uint32_t offset_t;
+typedef struct pgtable_struct pgtable_t;
+struct pgtable_struct
+{
+	/* used to indicate for physical address */
+	struct
+	{
+		offset_t dir;
+		offset_t table;
+	} offset;
+
+	page_directory_t *page_directory;
+};
+
 /* frame */
 struct page
 {
@@ -93,13 +109,16 @@ struct page
 	uint8_t _refcount;
 
 	void *virtual;
+
+	/* used to ordered list in buddy */
+	LIST_HEAD (chain);
 } __attribute__((packed));
 
 /* extern */
 extern char _kernel_end;
 
-extern int *_init_page_directory;
-extern int *_init_page_tables;
+extern char _init_page_directory;
+extern char _init_page_tables;
 
 void paging_init (void);
 

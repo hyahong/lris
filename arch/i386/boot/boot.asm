@@ -9,7 +9,6 @@ STACK_SIZE equ 16384
 PAGE_SIZE equ 4096
 PAGE_COUNT equ 1024 * 1024
 KERNEL_NORMAL_PAGE_COUNT equ 229376
-KERNEL_NORMAL_DIR_COUNT equ 224
 
 
 ; multiboot header
@@ -39,6 +38,7 @@ _init_page_tables:
 
 ; inittext section
 section .inittext
+extern _kernel_end
 global start
 
 start:
@@ -52,6 +52,10 @@ start:
 	hlt
 
 boot_paging:
+	; evaluate a end point
+	mov edx, _kernel_end - 0xC0000000
+	shr edx, 12
+	inc edx
 	; physical offset
 	; flags
 	mov eax, 0x03
@@ -79,10 +83,12 @@ fill_page_higher:
 	add eax, PAGE_SIZE
 	add ecx, 1
 
-	cmp ecx, KERNEL_NORMAL_PAGE_COUNT
+	cmp ecx, edx
 	jne fill_page_higher
 
 fill_directory:
+	shr edx, 10
+	inc edx
 	mov ecx, 0
 	; 0 ~ 4 MB
 	mov eax, _init_page_table_low
@@ -99,7 +105,7 @@ fill_directory_higher:
 	add ecx, 1
 	mov dword [_init_page_directory + (ecx + 768) * 4], eax
 	
-	cmp ecx, KERNEL_NORMAL_DIR_COUNT
+	cmp ecx, edx
 	jne fill_directory_higher
 
 enable_paging:

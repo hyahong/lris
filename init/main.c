@@ -1,9 +1,8 @@
 #include "driver/vga.h"
 #include "driver/keyboard.h"
-#include "cpu/segment.h"
-#include "cpu/paging.h"
 #include "cpu/interrupt.h"
 
+#include "mm/memory.h"
 #include "lris/string.h"
 #include "lris/printk.h"
 #include "peripheral/getty.h"
@@ -18,13 +17,16 @@ char *logo = "\n" \
 "  #+#        #+#    #+#     #+#    #+#    #+#\n" \
 " ########## ###    ### ########### ########\n";
 
+extern void unittest (void);
+
 void kernel_init (void)
 {
 	vga_init ();
-	segment_init ();
-	paging_init ();
+	mm_init ();
 	interrupt_init ();
 	keyboard_init ();
+
+	unittest ();
 
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_LIGHT_CYAN);
 	printk ("\n\n%s\n\n\n", logo);

@@ -12,6 +12,15 @@ unsigned int strlen (const char *str)
 	return length;
 }
 
+char *strcpy (char *dest, const char *origin)
+{
+	int i;
+
+	for (i = 0; i < strlen (origin); i++)
+		dest[i] = origin[i];
+	return dest;
+}
+
 char *strncpy (char *dest, const char *origin, size_t n)
 {
 	int i;

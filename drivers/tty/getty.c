@@ -122,7 +122,7 @@ void getty_page (char *command[])
 	}
 	else if (!strcmp (command[1], "fault"))
 	{
-		int *addr = 0x500000;
+		int *addr = (int*) 0x500000;
 		*addr = 1;
 	}
 }
