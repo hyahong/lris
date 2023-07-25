@@ -8,6 +8,7 @@
 # define PHYSICAL_FRAME_COUNT (PHYSICAL_MEMORY_SIZE / PHYSICAL_FRAME_SIZE)
 
 # define PAGE_SIZE PHYSICAL_FRAME_SIZE
+# define PAGE_SHIFT 12
 
 # define KERNEL_MEMORY_SIZE (1ULL * 1024 * 1024 * 1024)
 # define USER_MEMORY_SIZE (PHYSICAL_MEMORY_SIZE - KERNEL_MEMORY_SIZE)
@@ -51,7 +52,7 @@
 
 /* struct page flags */
 # define PG_reserved 1 << 0
-# define PG_some 1 << 1
+# define PG_shared 1 << 1
 
 /* paging directory */
 typedef struct page_directory page_directory_t;
@@ -92,13 +93,6 @@ typedef uint32_t offset_t;
 typedef struct pgtable_struct pgtable_t;
 struct pgtable_struct
 {
-	/* used to indicate for physical address */
-	struct
-	{
-		offset_t dir;
-		offset_t table;
-	} offset;
-
 	page_directory_t *page_directory;
 };
 
@@ -121,5 +115,10 @@ extern char _init_page_directory;
 extern char _init_page_tables;
 
 void paging_init (void);
+
+uint32_t get_frame_index (const struct page *page);
+struct page *get_reserved_page (void);
+
+struct page *get_frame (int a);
 
 #endif

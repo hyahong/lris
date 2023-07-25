@@ -37,6 +37,7 @@ void irq14 (int error_code)
 		:
 		: "memory"
 	);
+	printk ("\n%x\n", cr2);
 
 	asm volatile ("hlt");
 }

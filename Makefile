@@ -23,7 +23,7 @@ DRIVERS		= drivers/tty/wrapper.c drivers/tty/getty.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c kernel/assert.c kernel/list.c
 LIB			= lib/string.c
-MM			= mm/memory.c mm/zone.c
+MM			= mm/memory.c mm/zone.c mm/allocator.c
 
 SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB) $(MM) $(UNITTEST)
 INCS		= -Iinclude -Iarch/$(TARGET)/include

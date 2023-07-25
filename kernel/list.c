@@ -16,6 +16,10 @@ void list_add (struct list_head *new, struct list_head *head)
 
 void list_del (struct list_head *entry)
 {
-	entry->prev->next = entry->next;
-	entry->next->prev = entry->prev;
+	if (entry->prev)
+		entry->prev->next = entry->next;
+	if (entry->next)
+		entry->next->prev = entry->prev;
+	entry->prev = NULL;
+	entry->next = NULL;
 }

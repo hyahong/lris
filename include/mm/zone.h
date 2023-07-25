@@ -16,34 +16,37 @@
 # define ZONE_COUNT 3
 # define ZONE_NAME_MAX 16
 
-enum _mm_zone_name
+/* this sets a size of biggest block to 4 M (default) */
+# define MAX_ORDER 11
+
+enum zone_selector
 {
 	ZONE_DMA,
 	ZONE_NORMAL,
 	ZONE_HIGH
 };
 
-typedef struct mm_zone_struct mm_zone_t;
-struct mm_zone_struct
+/* buddy allocator */
+struct free_area
+{
+	/* pages will be chained here */
+	struct list_head free_list;
+	/* block size */
+	unsigned long nr_free;
+};
+
+struct zone
 {
 	char name[ZONE_NAME_MAX];
 
-	/* paged address */
-	uint32_t mapped;
-	uint32_t limit;
-};
-
-/* sample */
-/* zones are stacked in kernel memory space in order */
-static mm_zone_t _mm_zone[ZONE_COUNT] = {
-	{ "DMA", 0, 0x1000000 },
-	{ "NORMAL", 0, 0x37000000 },
-	{ "HIGH", 0, 0x8000000 }
+	/* used to allocate a page */
+	struct free_area free_area[MAX_ORDER];
 };
 
 /* extern */
-extern mm_zone_t mm_zone[ZONE_COUNT];
-
 void mm_zone_init (void);
+struct zone *mm_zone_get (enum zone_selector sel);
+
+void add_page_zone (struct zone *_zone, struct page *page);
 
 #endif
