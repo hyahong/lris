@@ -117,8 +117,10 @@ extern char _init_page_tables;
 void paging_init (void);
 
 uint32_t get_frame_index (const struct page *page);
-struct page *get_reserved_page (void);
+struct page *get_frame (int index);
 
-struct page *get_frame (int a);
+void *get_physical_address (void *address);
+
+struct page *get_reserved_page (void);
 
 #endif

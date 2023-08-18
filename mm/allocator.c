@@ -2,6 +2,7 @@
 
 #include "mm/zone.h"
 #include "mm/allocator.h"
+#include "mm/compact.h"
 #include "lris/list.h"
 #include "lris/assert.h"
 
@@ -56,10 +57,15 @@ struct page *get_block_by_order (struct zone *zone, int order)
 	
 	/* if current order is the end */
 	if (order == MAX_ORDER - 1)
+	{
+		return NULL;
 		panic ("there is no more memory block");
+	}
 
 	/* split the upper block */
 	block = get_block_by_order (zone, order + 1);
+	if (block == NULL)
+		return NULL;
 	/* use first block and insert the rest block into list */
 	remains = get_frame (get_frame_index (block) + (1 << order));
 	list_add (&remains->chain, &zone->free_area[order].free_list);
@@ -68,7 +74,7 @@ struct page *get_block_by_order (struct zone *zone, int order)
 	return block;
 }
 
-struct page *alloc_page (struct zone *zone, int num)
+struct page *alloc_pages (struct zone *zone, int num)
 {
 	/* this function allocates num pages from zone */
 	struct page *leader, *cur, *next = NULL;
@@ -78,6 +84,8 @@ struct page *alloc_page (struct zone *zone, int num)
 	order = get_order_page (num);
 	/* only get the leader block */
 	leader = get_block_by_order (zone, order);
+	if (!leader)
+		return NULL;
 	leader->chain.prev = NULL;
 	/* chaining */
 	leader_index = get_frame_index (leader);
@@ -95,7 +103,7 @@ struct page *alloc_page (struct zone *zone, int num)
 	return leader;
 }
 
-void *free_page (struct zone *zone, struct page *page)
+void *free_pages (struct zone *zone, struct page *page)
 {
 	struct list_head *head, *next;
 
@@ -112,7 +120,7 @@ void *free_page (struct zone *zone, struct page *page)
 	}
 }
 
-static void *buddy_alloc (size_t size, gfp_t flags)
+static void *kmalloc_large (size_t size, gfp_t flags)
 {
 	struct zone *zone;
 	struct page *page;
@@ -123,39 +131,63 @@ static void *buddy_alloc (size_t size, gfp_t flags)
 	order = get_order_size (size);
 
 	zone = mm_zone_get (ZONE_NORMAL);
-	page = alloc_page (zone, 1 << order);
+	page = alloc_pages (zone, 1 << order);
+	if (!page)
+		return NULL;
 
 	return page->virtual;
 }
 
-static void buddy_free (const void *ptr)
+static void kfree_large (const void *ptr)
 {
 	struct zone *zone;
 	uint32_t frame_index;
 
-	frame_index = get_physical_address (ptr) >> PAGE_SHIFT;
+	frame_index = (uint32_t) get_physical_address ((void *) ptr) >> PAGE_SHIFT;
 	zone = mm_zone_get (ZONE_NORMAL);
 
-	free_page (zone, get_frame (frame_index));
-}
-
-static void *slab (size_t size, gfp_t flags)
-{
-	printk ("slab\n");
-
-	return NULL;
+	free_pages (zone, get_frame (frame_index));
 }
 
 void *kmalloc (size_t size, gfp_t flags)
 {
-//	if (size < PAGE_SIZE * 2)
-//		return slab (size, flags);
-	return buddy_alloc (size, flags);
+	if (size <= PAGE_SIZE / 2)
+		return kmalloc_compact (size, flags);
+	return kmalloc_large (size, flags);
 }
 
 void kfree (const void *ptr)
 {
-	/* slab or buddy */
-	/* if buddy */
-	buddy_free (ptr);
+	if (kmalloc_is_compact (ptr))
+	{
+		kfree_compact (ptr);
+	}
+	else
+	{
+		kfree_large (ptr);
+	}
+}
+
+size_t ksize (const void *ptr)
+{
+	struct list_head *head;
+	uint32_t frame_index;
+	size_t size;
+	int i;
+
+	size = ksize_compact (ptr);
+	if (size != 0)
+	{
+		return size;
+	}
+
+	frame_index = (uint32_t) get_physical_address ((void *) ptr) >> PAGE_SHIFT;
+	head = &get_frame (frame_index)->chain;
+	i = 0;
+	while (head)
+	{
+		i++;
+		head = head->next;
+	}
+	return PAGE_SIZE * i;
 }

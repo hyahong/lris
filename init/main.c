@@ -6,6 +6,7 @@
 #include "mm/memory.h"
 #include "mm/zone.h"
 #include "mm/allocator.h"
+#include "mm/compact.h"
 #include "lris/list.h"
 #include "lris/string.h"
 #include "lris/printk.h"
@@ -30,11 +31,13 @@ void kernel_init (void)
 	mm_init ();
 	keyboard_init ();
 
+	vga_clear ();
+
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_LIGHT_CYAN);
-//	printk ("\n\n%s\n\n\n", logo);
+	printk ("\n\n%s\n\n\n", logo);
 	vga_set_color (VGA_COLOR_BLACK, VGA_COLOR_WHITE);
 
-//	getty_init ();
+	getty_init ();
 
 	while (1)
 	{

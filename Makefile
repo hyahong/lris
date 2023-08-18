@@ -23,7 +23,7 @@ DRIVERS		= drivers/tty/wrapper.c drivers/tty/getty.c
 INIT		= init/main.c
 KERNEL		= kernel/printk/printk.c kernel/assert.c kernel/list.c
 LIB			= lib/string.c
-MM			= mm/memory.c mm/zone.c mm/allocator.c
+MM			= mm/memory.c mm/zone.c mm/allocator.c mm/compact.c
 
 SRCS		= $(ARCH) $(DRIVERS) $(INIT) $(KERNEL) $(LIB) $(MM) $(UNITTEST)
 INCS		= -Iinclude -Iarch/$(TARGET)/include
@@ -56,7 +56,7 @@ pack:
 	@cp $(BIN) iso/boot
 	@cp grub.cfg iso/boot/grub
 	@grub-mkrescue -o $(ISO) iso
-#@$(RM) $(BIN) iso
+	@$(RM) $(BIN) iso
 
 run:
 	@qemu-system-i386 -smp 1 -m 4G -cdrom $(ISO) -s 

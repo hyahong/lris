@@ -13,11 +13,9 @@
  * ######
  */
 
+/* zone */
 # define ZONE_COUNT 3
 # define ZONE_NAME_MAX 16
-
-/* this sets a size of biggest block to 4 M (default) */
-# define MAX_ORDER 11
 
 enum zone_selector
 {
@@ -27,6 +25,10 @@ enum zone_selector
 };
 
 /* buddy allocator */
+
+/* this sets a size of biggest block to 4 M (default) */
+# define MAX_ORDER 11
+
 struct free_area
 {
 	/* pages will be chained here */
@@ -35,12 +37,36 @@ struct free_area
 	unsigned long nr_free;
 };
 
+/* compact */
+# define COMPACT_COUNT 7
+
+/* 32, 64, 128, 256, 512, 1024, 2048 */
+# define COMPACT_PAGE_COUNT { 1, 1, 1, 1, 1, 1, 1 }
+# define COMPACT_BITMAP_MAX_SIZE (1 * PAGE_SIZE / 32 / 32)
+
+struct compact_area
+{
+	uint16_t size;
+	uint32_t bitmap[COMPACT_BITMAP_MAX_SIZE];
+
+	uint16_t available;
+
+	struct
+	{
+		void *ptr;
+		uint16_t count;
+	} page;
+};
+
 struct zone
 {
 	char name[ZONE_NAME_MAX];
 
 	/* used to allocate a page */
 	struct free_area free_area[MAX_ORDER];
+
+	/* compact allocator */
+	struct compact_area compact_area[COMPACT_COUNT];
 };
 
 /* extern */
